@@ -47,3 +47,36 @@ def test_cli_creates_read_only_duplicate_report(tmp_path: Path, capsys: object) 
     assert second.read_bytes() == b"same"
     assert "Read-only report" in output.read_text(encoding="utf-8")
     assert "Checked 2 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
+
+
+def test_cli_creates_opt_in_musicbrainz_report(
+    tmp_path: Path, capsys: object, monkeypatch: object
+) -> None:
+    from mvo.musicbrainz import MusicBrainzClient
+
+    library = tmp_path / "library"
+    library.mkdir()
+    media = library / "Artist - Song.mp4"
+    media.write_bytes(b"unchanged")
+    output = tmp_path / "musicbrainz.html"
+    payload = {
+        "recordings": [
+            {
+                "id": "recording-id",
+                "score": 100,
+                "title": "Song",
+                "artist-credit": [{"name": "Artist"}],
+            }
+        ]
+    }
+    client = MusicBrainzClient(transport=lambda *_args: payload)
+    monkeypatch.setattr("mvo.cli.MusicBrainzClient", lambda: client)  # type: ignore[attr-defined]
+
+    exit_code = main(
+        [str(library), "--musicbrainz", "--max-queries", "1", "-o", str(output)]
+    )
+
+    assert exit_code == 0
+    assert media.read_bytes() == b"unchanged"
+    assert "did not upload audio" in output.read_text(encoding="utf-8")
+    assert "Enriched 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]

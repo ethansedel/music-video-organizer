@@ -30,6 +30,16 @@ class DuplicateKind(StrEnum):
     METADATA = "metadata match"
 
 
+class MatchStatus(StrEnum):
+    """Disposition of an optional MusicBrainz lookup."""
+
+    MATCHED = "matched"
+    REVIEW = "review"
+    NOT_FOUND = "not found"
+    SKIPPED = "skipped"
+    ERROR = "error"
+
+
 @dataclass(frozen=True, slots=True)
 class Confidence:
     """A bounded confidence score and the evidence behind it."""
@@ -139,3 +149,35 @@ class DuplicateResult:
     root: Path
     groups: tuple[DuplicateGroup, ...]
     issues: tuple[ScanIssue, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class MusicBrainzCandidate:
+    """Compact recording candidate returned by MusicBrainz."""
+
+    recording_id: str
+    title: str
+    artist_credit: str
+    score: int
+    first_release_date: str | None
+    release_titles: tuple[str, ...]
+    video: bool | None
+
+
+@dataclass(frozen=True, slots=True)
+class EnrichedVideo:
+    """One analyzed video and its optional MusicBrainz candidates."""
+
+    video: AnalyzedVideo
+    status: MatchStatus
+    candidates: tuple[MusicBrainzCandidate, ...]
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
+class EnrichmentResult:
+    """Read-only MusicBrainz enrichment results."""
+
+    root: Path
+    items: tuple[EnrichedVideo, ...]
+    query_count: int

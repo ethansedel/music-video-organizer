@@ -14,7 +14,7 @@
 
 - Duplicate detection
 
-# Version 0.6
+# Version 0.6 — released
 
 - MusicBrainz
 
