@@ -15,6 +15,14 @@ class ConfidenceLevel(StrEnum):
     HIGH = "high"
 
 
+class PlanStatus(StrEnum):
+    """Safety disposition for a proposed organization action."""
+
+    READY = "ready"
+    REVIEW = "review"
+    CONFLICT = "conflict"
+
+
 @dataclass(frozen=True, slots=True)
 class Confidence:
     """A bounded confidence score and the evidence behind it."""
@@ -78,4 +86,23 @@ class AnalysisResult:
 
     root: Path
     videos: tuple[AnalyzedVideo, ...]
+    issues: tuple[ScanIssue, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannedVideo:
+    """One read-only proposed destination for an analyzed video."""
+
+    video: AnalyzedVideo
+    destination: Path
+    status: PlanStatus
+    notes: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class OrganizationPlan:
+    """A complete dry-run plan that cannot modify media."""
+
+    root: Path
+    items: tuple[PlannedVideo, ...]
     issues: tuple[ScanIssue, ...]

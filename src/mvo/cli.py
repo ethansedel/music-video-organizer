@@ -6,6 +6,8 @@ import argparse
 from pathlib import Path
 
 from mvo.analyzer import LibraryAnalyzer
+from mvo.plan_report import write_plan_report
+from mvo.planner import FolderPlanner
 from mvo.report import write_html_report
 
 
@@ -24,6 +26,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("report.html"),
         help="HTML report path (default: report.html)",
     )
+    parser.add_argument(
+        "--plan",
+        action="store_true",
+        help="write a read-only organization plan instead of the analysis report",
+    )
     return parser
 
 
@@ -33,10 +40,15 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         result = LibraryAnalyzer().analyze(args.library)
-        report = write_html_report(result, args.output)
+        if args.plan:
+            plan = FolderPlanner().plan(result)
+            report = write_plan_report(plan, args.output)
+        else:
+            report = write_html_report(result, args.output)
     except (OSError, ValueError) as error:
         build_parser().error(str(error))
-    print(f"Analyzed {len(result.videos)} video(s). Report: {report}")
+    label = "Planned" if args.plan else "Analyzed"
+    print(f"{label} {len(result.videos)} video(s). Report: {report}")
     return 0
 
 

@@ -1,11 +1,11 @@
-# Version 0.3
+# Version 0.3 — released
 
 - Improve tokenizer
 - Rewrite parser
 - Improve HTML report
 - Build regression tests
 
-# Version 0.4
+# Version 0.4 — released
 
 - Folder planner
 - Dry-run organizer

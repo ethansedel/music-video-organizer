@@ -2,7 +2,8 @@
 
 Music Video Organizer (MVO) scans a music-video library, interprets filenames,
 scores the quality of each interpretation, and writes a standalone HTML report.
-Version 0.3 is deliberately read-only: it never renames, moves, or deletes media.
+Version 0.4 is deliberately read-only: it never renames, moves, or deletes
+media. Its planner only previews proposed Jellyfin-friendly paths.
 
 ## Filename conventions
 
@@ -25,8 +26,10 @@ Python 3.12 or newer is required.
 ```shell
 python -m pip install -e '.[dev]'
 mvo /path/to/music-videos --output report.html
+mvo /path/to/music-videos --plan --output dry-run.html
 pytest
 ```
 
 The only file MVO writes is the report path explicitly supplied by the user.
-
+The dry-run planner marks uncertain metadata for review and detects destination
+collisions before any future execution feature is considered.
