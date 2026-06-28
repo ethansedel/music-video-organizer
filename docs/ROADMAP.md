@@ -10,7 +10,7 @@
 - Folder planner
 - Dry-run organizer
 
-# Version 0.5
+# Version 0.5 — released
 
 - Duplicate detection
 

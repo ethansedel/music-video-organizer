@@ -23,6 +23,13 @@ class PlanStatus(StrEnum):
     CONFLICT = "conflict"
 
 
+class DuplicateKind(StrEnum):
+    """Strength of evidence connecting files in a duplicate group."""
+
+    EXACT = "exact"
+    METADATA = "metadata match"
+
+
 @dataclass(frozen=True, slots=True)
 class Confidence:
     """A bounded confidence score and the evidence behind it."""
@@ -105,4 +112,30 @@ class OrganizationPlan:
 
     root: Path
     items: tuple[PlannedVideo, ...]
+    issues: tuple[ScanIssue, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class DuplicateGroup:
+    """Two or more files connected by exact or metadata evidence."""
+
+    kind: DuplicateKind
+    signature: str
+    videos: tuple[AnalyzedVideo, ...]
+
+    @property
+    def recoverable_bytes(self) -> int:
+        """Potential savings for exact duplicates; zero for metadata matches."""
+
+        if self.kind is not DuplicateKind.EXACT:
+            return 0
+        return sum(video.source.size_bytes for video in self.videos[1:])
+
+
+@dataclass(frozen=True, slots=True)
+class DuplicateResult:
+    """Read-only duplicate findings plus recoverable scan/hash issues."""
+
+    root: Path
+    groups: tuple[DuplicateGroup, ...]
     issues: tuple[ScanIssue, ...]

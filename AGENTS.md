@@ -6,7 +6,7 @@ Music Video Organizer is a safe-first application for organizing music video lib
 
 ## Current Milestone
 
-Version 0.4
+Version 0.5
 
 Focus only on:
 
@@ -17,6 +17,7 @@ Focus only on:
 - HTML reports
 - Folder planner
 - Dry-run organization report
+- Read-only duplicate detection
 - Unit tests
 
 Do NOT implement:

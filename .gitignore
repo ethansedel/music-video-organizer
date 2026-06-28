@@ -8,3 +8,4 @@ build/
 *.egg-info/
 report.html
 dry-run.html
+duplicates.html
