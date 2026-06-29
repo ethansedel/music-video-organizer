@@ -22,7 +22,7 @@
 
 - AcoustID
 
-# Version 0.8
+# Version 0.8 — in development
 
 - Artwork
 

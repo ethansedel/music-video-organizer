@@ -8,6 +8,9 @@ from pathlib import Path
 
 from mvo.acoustid import AcoustIDClient, FingerprintExtractor
 from mvo.analyzer import LibraryAnalyzer
+from mvo.artwork import ArtworkFinder
+from mvo.artwork_report import write_artwork_report
+from mvo.coverart import CoverArtClient
 from mvo.duplicate_report import write_duplicate_report
 from mvo.duplicates import DuplicateDetector
 from mvo.enrichment import MusicBrainzEnricher
@@ -56,6 +59,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="opt in to local Chromaprint and AcoustID fingerprint lookups",
     )
+    modes.add_argument(
+        "--artwork",
+        action="store_true",
+        help="opt in to remote Cover Art Archive thumbnail previews",
+    )
     parser.add_argument(
         "--max-queries",
         type=int,
@@ -68,6 +76,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=5,
         help="maximum files fingerprinted and sent to AcoustID (default: 5)",
     )
+    parser.add_argument(
+        "--max-artwork",
+        type=int,
+        default=10,
+        help="maximum files queried for artwork previews (default: 10)",
+    )
     return parser
 
 
@@ -77,7 +91,12 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         result = LibraryAnalyzer().analyze(args.library)
-        if args.acoustid:
+        if args.artwork:
+            artwork = ArtworkFinder(MusicBrainzClient(), CoverArtClient()).find(
+                result, max_files=args.max_artwork
+            )
+            report = write_artwork_report(artwork, args.output)
+        elif args.acoustid:
             client_key = os.environ.get("ACOUSTID_CLIENT_KEY", "")
             if not client_key:
                 raise ValueError("ACOUSTID_CLIENT_KEY must be set for --acoustid")
@@ -103,7 +122,9 @@ def main(argv: list[str] | None = None) -> int:
             report = write_html_report(result, args.output)
     except (OSError, ValueError) as error:
         build_parser().error(str(error))
-    if args.acoustid:
+    if args.artwork:
+        label = "Artwork-checked"
+    elif args.acoustid:
         label = "Fingerprint-checked"
     elif args.musicbrainz:
         label = "Enriched"

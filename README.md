@@ -2,9 +2,9 @@
 
 Music Video Organizer (MVO) scans a music-video library, interprets filenames,
 scores the quality of each interpretation, and writes a standalone HTML report.
-Version 0.7 remains read-only. Acoustic identification is explicitly
-opt-in: Chromaprint runs locally, and only compact fingerprints plus durations
-are sent to AcoustID. Audio, paths, and filenames are never uploaded.
+Version 0.8 development remains read-only. Artwork lookup is explicitly opt-in
+and previews canonical release-group thumbnails from the Cover Art Archive. MVO
+does not save artwork beside media or write image data into video files.
 
 ## Filename conventions
 
@@ -31,6 +31,7 @@ mvo /path/to/music-videos --plan --output dry-run.html
 mvo /path/to/music-videos --duplicates --output duplicates.html
 mvo /path/to/music-videos --musicbrainz --max-queries 25 --output musicbrainz.html
 ACOUSTID_CLIENT_KEY=... mvo /path/to/music-videos --acoustid --max-fingerprints 5 --output acoustid.html
+mvo /path/to/music-videos --artwork --max-artwork 10 --output artwork.html
 pytest
 ```
 
@@ -51,3 +52,8 @@ application client key in the `ACOUSTID_CLIENT_KEY` environment variable. Do not
 use the separate personal user API key. MVO uses POST
 lookups only—there is intentionally no fingerprint submission feature—and caps
 work at five files by default.
+
+Artwork mode uses parsed artist/title text to find a MusicBrainz release group,
+then requests image metadata from the Cover Art Archive. The generated report
+loads remote thumbnails lazily when opened; it does not create local artwork
+files. Work is capped at ten eligible videos by default.

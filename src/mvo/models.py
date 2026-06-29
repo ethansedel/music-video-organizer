@@ -40,6 +40,16 @@ class MatchStatus(StrEnum):
     ERROR = "error"
 
 
+class ArtworkStatus(StrEnum):
+    """Disposition of a read-only artwork preview lookup."""
+
+    FOUND = "found"
+    REVIEW = "review"
+    NOT_FOUND = "not found"
+    SKIPPED = "skipped"
+    ERROR = "error"
+
+
 @dataclass(frozen=True, slots=True)
 class Confidence:
     """A bounded confidence score and the evidence behind it."""
@@ -162,6 +172,18 @@ class MusicBrainzCandidate:
     first_release_date: str | None
     release_titles: tuple[str, ...]
     video: bool | None
+    release_groups: tuple[ReleaseGroupRef, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ReleaseGroupRef:
+    """MusicBrainz release group that can provide canonical cover art."""
+
+    release_group_id: str
+    title: str
+    primary_type: str | None
+    score: int = 0
+    artist_credit: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -228,3 +250,39 @@ class FingerprintResult:
     items: tuple[FingerprintedVideo, ...]
     fingerprint_count: int
     lookup_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class ArtworkImage:
+    """Remote Cover Art Archive image metadata; no image bytes are stored."""
+
+    image_url: str
+    thumbnail_250: str | None
+    thumbnail_500: str | None
+    thumbnail_1200: str | None
+    types: tuple[str, ...]
+    front: bool
+    back: bool
+    approved: bool
+    comment: str
+
+
+@dataclass(frozen=True, slots=True)
+class ArtworkPreview:
+    """One video and its remote artwork preview candidates."""
+
+    video: AnalyzedVideo
+    status: ArtworkStatus
+    release_group: ReleaseGroupRef | None
+    images: tuple[ArtworkImage, ...]
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
+class ArtworkResult:
+    """Read-only artwork lookup results."""
+
+    root: Path
+    items: tuple[ArtworkPreview, ...]
+    musicbrainz_queries: int
+    cover_art_queries: int

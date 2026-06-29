@@ -6,7 +6,7 @@ Music Video Organizer is a safe-first application for organizing music video lib
 
 ## Current Milestone
 
-Version 0.7
+Version 0.8
 
 Focus only on:
 
@@ -20,6 +20,7 @@ Focus only on:
 - Read-only duplicate detection
 - Opt-in MusicBrainz filename enrichment
 - Opt-in local Chromaprint and AcoustID lookup
+- Opt-in Cover Art Archive previews
 - Unit tests
 
 Do NOT implement:
@@ -27,7 +28,7 @@ Do NOT implement:
 - File moves
 - File renames
 - File deletion
-- Artwork downloads
+- Artwork downloads beside media
 
 ## Safety
 

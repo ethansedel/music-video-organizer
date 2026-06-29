@@ -125,3 +125,49 @@ def test_cli_requires_acoustid_application_client_key(
 
     with pytest.raises(SystemExit):
         main([str(tmp_path), "--acoustid"])
+
+
+def test_cli_creates_opt_in_artwork_preview(
+    tmp_path: Path, capsys: object, monkeypatch: object
+) -> None:
+    from mvo.coverart import CoverArtClient
+    from mvo.musicbrainz import MusicBrainzClient
+
+    library = tmp_path / "library"
+    library.mkdir()
+    media = library / "Artist - Song.mp4"
+    media.write_bytes(b"unchanged")
+    output = tmp_path / "artwork.html"
+    musicbrainz_payload = {
+        "release-groups": [
+            {
+                "id": "group",
+                "score": 100,
+                "title": "Song",
+                "artist-credit": [{"name": "Artist"}],
+            }
+        ]
+    }
+    art_payload = {
+        "images": [
+            {
+                "image": "https://coverartarchive.org/full.jpg",
+                "thumbnails": {},
+                "front": True,
+                "approved": True,
+            }
+        ]
+    }
+    mb_client = MusicBrainzClient(transport=lambda *_args: musicbrainz_payload)
+    art_client = CoverArtClient(transport=lambda *_args: art_payload)
+    monkeypatch.setattr("mvo.cli.MusicBrainzClient", lambda: mb_client)  # type: ignore[attr-defined]
+    monkeypatch.setattr("mvo.cli.CoverArtClient", lambda: art_client)  # type: ignore[attr-defined]
+
+    exit_code = main(
+        [str(library), "--artwork", "--max-artwork", "1", "-o", str(output)]
+    )
+
+    assert exit_code == 0
+    assert media.read_bytes() == b"unchanged"
+    assert "Remote preview only" in output.read_text(encoding="utf-8")
+    assert "Artwork-checked 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
