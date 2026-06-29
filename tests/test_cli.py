@@ -33,6 +33,21 @@ def test_cli_creates_read_only_plan_report(tmp_path: Path, capsys: object) -> No
     assert "Planned 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
 
 
+def test_cli_creates_read_only_preflight_report(tmp_path: Path, capsys: object) -> None:
+    library = tmp_path / "library"
+    library.mkdir()
+    media = library / "Artist - Song.mp4"
+    media.write_bytes(b"unchanged")
+    output = tmp_path / "preflight.html"
+
+    exit_code = main([str(library), "--preflight", "--output", str(output)])
+
+    assert exit_code == 0
+    assert media.read_bytes() == b"unchanged"
+    assert "Safety snapshot only" in output.read_text(encoding="utf-8")
+    assert "Preflight-checked 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
+
+
 def test_cli_creates_read_only_duplicate_report(tmp_path: Path, capsys: object) -> None:
     library = tmp_path / "library"
     library.mkdir()

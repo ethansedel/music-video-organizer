@@ -7,6 +7,7 @@ from mvo.duplicates import DuplicateDetector
 from mvo.musicbrainz import MusicBrainzClient
 from mvo.parser import FilenameParser
 from mvo.planner import FolderPlanner
+from mvo.preflight import PlanPreflight
 from mvo.scanner import LibraryScanner
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "LibraryAnalyzer",
     "LibraryScanner",
     "MusicBrainzClient",
+    "PlanPreflight",
 ]
-__version__ = "0.8.0.dev0"
+__version__ = "0.9.0.dev0"

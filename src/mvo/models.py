@@ -23,6 +23,14 @@ class PlanStatus(StrEnum):
     CONFLICT = "conflict"
 
 
+class PreflightStatus(StrEnum):
+    """Execution-readiness disposition for one planned video."""
+
+    READY = "ready"
+    UNCHANGED = "unchanged"
+    BLOCKED = "blocked"
+
+
 class DuplicateKind(StrEnum):
     """Strength of evidence connecting files in a duplicate group."""
 
@@ -133,6 +141,32 @@ class OrganizationPlan:
     root: Path
     items: tuple[PlannedVideo, ...]
     issues: tuple[ScanIssue, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PreflightItem:
+    """One planned video plus its read-only safety validation."""
+
+    planned: PlannedVideo
+    status: PreflightStatus
+    checks: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PreflightResult:
+    """Safety snapshot for a complete organization plan."""
+
+    root: Path
+    items: tuple[PreflightItem, ...]
+    issues: tuple[ScanIssue, ...]
+
+    @property
+    def safe_to_execute(self) -> bool:
+        """Whether this snapshot contains no known execution blockers."""
+
+        return not self.issues and all(
+            item.status is not PreflightStatus.BLOCKED for item in self.items
+        )
 
 
 @dataclass(frozen=True, slots=True)

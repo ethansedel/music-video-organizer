@@ -2,9 +2,9 @@
 
 Music Video Organizer (MVO) scans a music-video library, interprets filenames,
 scores the quality of each interpretation, and writes a standalone HTML report.
-Version 0.8 development remains read-only. Artwork lookup is explicitly opt-in
-and previews canonical release-group thumbnails from the Cover Art Archive. MVO
-does not save artwork beside media or write image data into video files.
+Version 0.9 development remains read-only. Its execution preflight validates a
+folder plan against the current filesystem and identifies blockers before any
+future move feature is considered. MVO does not rename, move, or delete media.
 
 ## Filename conventions
 
@@ -32,6 +32,7 @@ mvo /path/to/music-videos --duplicates --output duplicates.html
 mvo /path/to/music-videos --musicbrainz --max-queries 25 --output musicbrainz.html
 ACOUSTID_CLIENT_KEY=... mvo /path/to/music-videos --acoustid --max-fingerprints 5 --output acoustid.html
 mvo /path/to/music-videos --artwork --max-artwork 10 --output artwork.html
+mvo /path/to/music-videos --preflight --output preflight.html
 pytest
 ```
 
@@ -57,3 +58,9 @@ Artwork mode uses parsed artist/title text to find a MusicBrainz release group,
 then requests image metadata from the Cover Art Archive. The generated report
 loads remote thumbnails lazily when opened; it does not create local artwork
 files. Work is capped at ten eligible videos by default.
+
+Preflight mode rebuilds the organization plan and checks that sources still
+exist at the scanned size, destinations stay inside the library, destination
+paths are unobstructed, and review or collision items remain blocked. The HTML
+is a snapshot only; a future execution mode must repeat every check immediately
+before touching a file.

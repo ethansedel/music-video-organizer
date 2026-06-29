@@ -22,9 +22,15 @@
 
 - AcoustID
 
-# Version 0.8 — in development
+# Version 0.8 — released
 
 - Artwork
+
+# Version 0.9 — in development
+
+- Read-only execution preflight
+- Detect stale sources, unsafe destinations, and filesystem conflicts
+- Produce an execution-readiness report without changing media
 
 # Version 1.0
 

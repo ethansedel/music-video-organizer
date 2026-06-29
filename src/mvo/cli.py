@@ -20,6 +20,8 @@ from mvo.fingerprinting import AcousticIdentifier
 from mvo.musicbrainz import MusicBrainzClient
 from mvo.plan_report import write_plan_report
 from mvo.planner import FolderPlanner
+from mvo.preflight import PlanPreflight
+from mvo.preflight_report import write_preflight_report
 from mvo.report import write_html_report
 
 
@@ -64,6 +66,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="opt in to remote Cover Art Archive thumbnail previews",
     )
+    modes.add_argument(
+        "--preflight",
+        action="store_true",
+        help="validate organization-plan safety without modifying files",
+    )
     parser.add_argument(
         "--max-queries",
         type=int,
@@ -91,7 +98,11 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         result = LibraryAnalyzer().analyze(args.library)
-        if args.artwork:
+        if args.preflight:
+            plan = FolderPlanner().plan(result)
+            preflight = PlanPreflight().validate(plan)
+            report = write_preflight_report(preflight, args.output)
+        elif args.artwork:
             artwork = ArtworkFinder(MusicBrainzClient(), CoverArtClient()).find(
                 result, max_files=args.max_artwork
             )
@@ -122,7 +133,9 @@ def main(argv: list[str] | None = None) -> int:
             report = write_html_report(result, args.output)
     except (OSError, ValueError) as error:
         build_parser().error(str(error))
-    if args.artwork:
+    if args.preflight:
+        label = "Preflight-checked"
+    elif args.artwork:
         label = "Artwork-checked"
     elif args.acoustid:
         label = "Fingerprint-checked"
