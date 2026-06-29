@@ -32,7 +32,7 @@
 - Detect stale sources, unsafe destinations, and filesystem conflicts
 - Produce an execution-readiness report without changing media
 
-# Version 1.0 — in development
+# Version 1.0 — released
 
 - Safe execution
 - Explicit confirmation and immediate revalidation
@@ -40,3 +40,9 @@
 - Execution audit report
 - Jellyfin integration
 - ErsatzTV integration
+
+# Version 1.1 — in development
+
+- Local web editor for skipped videos
+- Persistent artist, title, featured artist, version, and year corrections
+- Apply reviewed metadata to plans, preflight checks, and execution

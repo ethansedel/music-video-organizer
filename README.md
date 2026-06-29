@@ -34,6 +34,7 @@ mvo /path/to/music-videos --musicbrainz --max-queries 25 --output musicbrainz.ht
 ACOUSTID_CLIENT_KEY=... mvo /path/to/music-videos --acoustid --max-fingerprints 5 --output acoustid.html
 mvo /path/to/music-videos --artwork --max-artwork 10 --output artwork.html
 mvo /path/to/music-videos --preflight --output preflight.html
+mvo /path/to/music-videos --review
 mvo /path/to/test-library --execute --confirm-execution MOVE_FILES --output execution.html
 pytest
 ```
@@ -75,3 +76,16 @@ do not support hard links fall back to copy-verify-delete. If any move fails,
 MVO stops and reverses earlier moves from that run. Always review a fresh
 preflight report and test execution on a small copy before executing against a
 full library.
+
+## Review skipped videos
+
+Run `mvo /path/to/music-videos --review` to open a local web editor containing
+only videos that need review or have destination conflicts. Correct the artist,
+title, featured artists, version, or year and choose **Save correction**. The
+editor never renames or moves a video.
+
+Corrections are stored in `.mvo-overrides.json` at the library root. Later
+analysis, plan, preflight, and execution commands load that file automatically.
+Use `--overrides /another/path.json` when the corrections file should live
+somewhere else. The editor listens only on this computer; press Control-C in the
+terminal when finished.

@@ -33,6 +33,26 @@ def test_cli_creates_read_only_plan_report(tmp_path: Path, capsys: object) -> No
     assert "Planned 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
 
 
+def test_cli_starts_review_editor_without_modifying_media(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    media = tmp_path / "Mystery.mp4"
+    media.write_bytes(b"unchanged")
+    called: dict[str, object] = {}
+
+    def fake_serve(session: object, *, port: int, open_browser: bool) -> None:
+        called.update(session=session, port=port, open_browser=open_browser)
+
+    monkeypatch.setattr("mvo.cli.serve_review", fake_serve)  # type: ignore[attr-defined]
+
+    exit_code = main([str(tmp_path), "--review", "--review-port", "9000"])
+
+    assert exit_code == 0
+    assert called["port"] == 9000
+    assert called["open_browser"] is True
+    assert media.read_bytes() == b"unchanged"
+
+
 def test_cli_creates_read_only_preflight_report(tmp_path: Path, capsys: object) -> None:
     library = tmp_path / "library"
     library.mkdir()

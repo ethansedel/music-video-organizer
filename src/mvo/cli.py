@@ -20,11 +20,13 @@ from mvo.executor import PlanExecutor
 from mvo.fingerprint_report import write_fingerprint_report
 from mvo.fingerprinting import AcousticIdentifier
 from mvo.musicbrainz import MusicBrainzClient
+from mvo.overrides import MetadataOverrideStore
 from mvo.plan_report import write_plan_report
 from mvo.planner import FolderPlanner
 from mvo.preflight import PlanPreflight
 from mvo.preflight_report import write_preflight_report
 from mvo.report import write_html_report
+from mvo.review import ReviewSession, serve_review
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -78,6 +80,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="move ready files only after explicit confirmation",
     )
+    modes.add_argument(
+        "--review",
+        action="store_true",
+        help="open a local editor for skipped videos",
+    )
     parser.add_argument(
         "--max-queries",
         type=int,
@@ -101,6 +108,22 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PHRASE",
         help="required with --execute; the exact phrase is MOVE_FILES",
     )
+    parser.add_argument(
+        "--overrides",
+        type=Path,
+        help="review corrections file (default: LIBRARY/.mvo-overrides.json)",
+    )
+    parser.add_argument(
+        "--review-port",
+        type=int,
+        default=8765,
+        help="local review editor port (default: 8765)",
+    )
+    parser.add_argument(
+        "--no-open",
+        action="store_true",
+        help="with --review, print the address without opening a browser",
+    )
     return parser
 
 
@@ -113,7 +136,19 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("--confirm-execution can only be used with --execute")
         if args.execute and args.output.suffix.casefold() not in {".html", ".htm"}:
             raise ValueError("--execute requires an HTML report output path")
-        result = LibraryAnalyzer().analyze(args.library)
+        if not 0 <= args.review_port <= 65535:
+            raise ValueError("--review-port must be between 0 and 65535")
+        raw_result = LibraryAnalyzer().analyze(args.library)
+        overrides_path = args.overrides or raw_result.root / ".mvo-overrides.json"
+        override_store = MetadataOverrideStore(overrides_path)
+        if args.review:
+            serve_review(
+                ReviewSession(raw_result, override_store),
+                port=args.review_port,
+                open_browser=not args.no_open,
+            )
+            return 0
+        result = override_store.apply(raw_result)
         execution = None
         if args.execute:
             if args.confirm_execution != "MOVE_FILES":
