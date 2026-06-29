@@ -6,7 +6,7 @@ Music Video Organizer is a safe-first application for organizing music video lib
 
 ## Current Milestone
 
-Version 0.9
+Version 1.0
 
 Focus only on:
 
@@ -22,20 +22,22 @@ Focus only on:
 - Opt-in local Chromaprint and AcoustID lookup
 - Opt-in Cover Art Archive previews
 - Read-only execution preflight
+- Explicitly confirmed, non-overwriting execution
+- Rollback and execution audit reports
 - Unit tests
 
 Do NOT implement:
 
-- File moves
-- File renames
+- Ungated file mutations
 - File deletion
 - Artwork downloads beside media
 
 ## Safety
 
-This project must NEVER modify user media unless an execution mode is explicitly added in a future version.
+This project must NEVER modify user media outside the explicit execution mode.
 
-All current behavior is scan/report only.
+Execution requires the exact `MOVE_FILES` confirmation phrase, immediate
+preflight validation, exclusive non-overwriting moves, and rollback on failure.
 
 ## Code Style
 

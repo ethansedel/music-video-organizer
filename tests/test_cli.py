@@ -48,6 +48,65 @@ def test_cli_creates_read_only_preflight_report(tmp_path: Path, capsys: object) 
     assert "Preflight-checked 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
 
 
+def test_cli_requires_exact_execution_confirmation(tmp_path: Path) -> None:
+    media = tmp_path / "Artist - Song.mp4"
+    media.write_bytes(b"unchanged")
+
+    with pytest.raises(SystemExit):
+        main([str(tmp_path), "--execute"])
+
+    assert media.read_bytes() == b"unchanged"
+
+
+def test_cli_rejects_execution_confirmation_outside_execution(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(SystemExit):
+        main([str(tmp_path), "--confirm-execution", "MOVE_FILES"])
+
+
+def test_cli_rejects_non_html_execution_audit(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            [
+                str(tmp_path),
+                "--execute",
+                "--confirm-execution",
+                "MOVE_FILES",
+                "--output",
+                str(tmp_path / "not-a-report.mp4"),
+            ]
+        )
+
+
+def test_cli_executes_confirmed_moves_and_writes_audit(
+    tmp_path: Path, capsys: object
+) -> None:
+    library = tmp_path / "library"
+    incoming = library / "incoming"
+    incoming.mkdir(parents=True)
+    media = incoming / "Artist - Song.mp4"
+    media.write_bytes(b"video")
+    output = tmp_path / "execution.html"
+
+    exit_code = main(
+        [
+            str(library),
+            "--execute",
+            "--confirm-execution",
+            "MOVE_FILES",
+            "--output",
+            str(output),
+        ]
+    )
+
+    assert exit_code == 0
+    assert not media.exists()
+    assert (library / "Artist" / "Artist - Song.mp4").read_bytes() == b"video"
+    assert "Execution completed" in output.read_text(encoding="utf-8")
+    assert "Executed 1 move(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
+
+
 def test_cli_creates_read_only_duplicate_report(tmp_path: Path, capsys: object) -> None:
     library = tmp_path / "library"
     library.mkdir()

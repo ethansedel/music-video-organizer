@@ -71,6 +71,22 @@ def test_missing_or_changed_source_blocks_execution(tmp_path: Path) -> None:
     assert "size changed" in changed.items[0].checks[0]
 
 
+def test_source_identity_change_after_scan_is_blocked(tmp_path: Path) -> None:
+    media = tmp_path / "incoming.mp4"
+    media.write_bytes(b"safe")
+    plan = _plan(tmp_path)
+    stat = media.stat()
+    source = plan.items[0].video.source
+    object.__setattr__(source, "modified_ns", stat.st_mtime_ns - 1)
+    object.__setattr__(source, "device", stat.st_dev)
+    object.__setattr__(source, "inode", stat.st_ino)
+
+    result = PlanPreflight().validate(plan)
+
+    assert result.items[0].status is PreflightStatus.BLOCKED
+    assert "modification time changed" in result.items[0].checks[0]
+
+
 def test_existing_destination_blocks_execution(tmp_path: Path) -> None:
     (tmp_path / "incoming.mp4").write_bytes(b"safe")
     destination = tmp_path / "Artist" / "Artist - Song.mp4"

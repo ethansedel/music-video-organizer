@@ -36,8 +36,16 @@ class PlanPreflight:
             blockers.append("source file is missing")
         else:
             try:
-                if source.stat().st_size != item.video.source.size_bytes:
+                stat = source.stat()
+                scanned = item.video.source
+                if stat.st_size != scanned.size_bytes:
                     blockers.append("source size changed after scanning")
+                if scanned.modified_ns and stat.st_mtime_ns != scanned.modified_ns:
+                    blockers.append("source modification time changed after scanning")
+                if scanned.device and stat.st_dev != scanned.device:
+                    blockers.append("source filesystem changed after scanning")
+                if scanned.inode and stat.st_ino != scanned.inode:
+                    blockers.append("source identity changed after scanning")
             except OSError as error:
                 blockers.append(f"source could not be checked: {error}")
 

@@ -38,7 +38,7 @@ class LibraryScanner:
                 if extension not in self._extensions or path.is_symlink():
                     continue
                 try:
-                    size_bytes = path.stat().st_size
+                    stat = path.stat()
                 except OSError as error:
                     issues.append(ScanIssue(path, str(error)))
                     continue
@@ -46,8 +46,11 @@ class LibraryScanner:
                     VideoFile(
                         path=path,
                         relative_path=path.relative_to(library_root),
-                        size_bytes=size_bytes,
+                        size_bytes=stat.st_size,
                         extension=extension,
+                        modified_ns=stat.st_mtime_ns,
+                        device=stat.st_dev,
+                        inode=stat.st_ino,
                     )
                 )
 

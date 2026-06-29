@@ -31,6 +31,16 @@ class PreflightStatus(StrEnum):
     BLOCKED = "blocked"
 
 
+class ExecutionStatus(StrEnum):
+    """Final outcome of one explicitly confirmed organization action."""
+
+    MOVED = "moved"
+    UNCHANGED = "unchanged"
+    SKIPPED = "skipped"
+    FAILED = "failed"
+    ROLLED_BACK = "rolled back"
+
+
 class DuplicateKind(StrEnum):
     """Strength of evidence connecting files in a duplicate group."""
 
@@ -88,6 +98,9 @@ class VideoFile:
     relative_path: Path
     size_bytes: int
     extension: str
+    modified_ns: int = 0
+    device: int = 0
+    inode: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,6 +180,31 @@ class PreflightResult:
         return not self.issues and all(
             item.status is not PreflightStatus.BLOCKED for item in self.items
         )
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutionItem:
+    """One planned video and its final execution outcome."""
+
+    planned: PlannedVideo
+    status: ExecutionStatus
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutionResult:
+    """Audit record for one explicitly confirmed execution run."""
+
+    root: Path
+    items: tuple[ExecutionItem, ...]
+    rolled_back: bool
+    rollback_complete: bool = True
+
+    @property
+    def moved_count(self) -> int:
+        """Number of moves that remain applied after the run."""
+
+        return sum(item.status is ExecutionStatus.MOVED for item in self.items)
 
 
 @dataclass(frozen=True, slots=True)

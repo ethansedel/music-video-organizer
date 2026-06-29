@@ -26,14 +26,17 @@
 
 - Artwork
 
-# Version 0.9 — in development
+# Version 0.9 — released
 
 - Read-only execution preflight
 - Detect stale sources, unsafe destinations, and filesystem conflicts
 - Produce an execution-readiness report without changing media
 
-# Version 1.0
+# Version 1.0 — in development
 
 - Safe execution
+- Explicit confirmation and immediate revalidation
+- Non-overwriting file moves with rollback
+- Execution audit report
 - Jellyfin integration
 - ErsatzTV integration

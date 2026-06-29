@@ -2,9 +2,10 @@
 
 Music Video Organizer (MVO) scans a music-video library, interprets filenames,
 scores the quality of each interpretation, and writes a standalone HTML report.
-Version 0.9 development remains read-only. Its execution preflight validates a
-folder plan against the current filesystem and identifies blockers before any
-future move feature is considered. MVO does not rename, move, or delete media.
+Version 1.0 development adds a deliberately gated execution mode. It moves only
+preflight-ready files, never overwrites a destination, stops on the first move
+failure, rolls back earlier moves, and records every outcome in an HTML audit.
+MVO still has no file-deletion feature.
 
 ## Filename conventions
 
@@ -33,6 +34,7 @@ mvo /path/to/music-videos --musicbrainz --max-queries 25 --output musicbrainz.ht
 ACOUSTID_CLIENT_KEY=... mvo /path/to/music-videos --acoustid --max-fingerprints 5 --output acoustid.html
 mvo /path/to/music-videos --artwork --max-artwork 10 --output artwork.html
 mvo /path/to/music-videos --preflight --output preflight.html
+mvo /path/to/test-library --execute --confirm-execution MOVE_FILES --output execution.html
 pytest
 ```
 
@@ -64,3 +66,12 @@ exist at the scanned size, destinations stay inside the library, destination
 paths are unobstructed, and review or collision items remain blocked. The HTML
 is a snapshot only; a future execution mode must repeat every check immediately
 before touching a file.
+
+Execution is intentionally difficult to trigger accidentally. `--execute` must
+be paired with the exact `--confirm-execution MOVE_FILES` phrase and an HTML
+audit path. Blocked or unchanged items are skipped. Ready files are moved using
+an exclusive operation that cannot overwrite an existing path. Filesystems that
+do not support hard links fall back to copy-verify-delete. If any move fails,
+MVO stops and reverses earlier moves from that run. Always review a fresh
+preflight report and test execution on a small copy before executing against a
+full library.

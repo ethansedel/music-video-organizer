@@ -1,4 +1,4 @@
-"""Command-line entry point for read-only library analysis."""
+"""Command-line entry point for safe music-video organization."""
 
 from __future__ import annotations
 
@@ -15,6 +15,8 @@ from mvo.duplicate_report import write_duplicate_report
 from mvo.duplicates import DuplicateDetector
 from mvo.enrichment import MusicBrainzEnricher
 from mvo.enrichment_report import write_enrichment_report
+from mvo.execution_report import write_execution_report
+from mvo.executor import PlanExecutor
 from mvo.fingerprint_report import write_fingerprint_report
 from mvo.fingerprinting import AcousticIdentifier
 from mvo.musicbrainz import MusicBrainzClient
@@ -30,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="mvo",
-        description="Scan music-video filenames and write a read-only HTML report.",
+        description="Analyze music-video filenames and safely organize libraries.",
     )
     parser.add_argument("library", type=Path, help="music-video library directory")
     parser.add_argument(
@@ -71,6 +73,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="validate organization-plan safety without modifying files",
     )
+    modes.add_argument(
+        "--execute",
+        action="store_true",
+        help="move ready files only after explicit confirmation",
+    )
     parser.add_argument(
         "--max-queries",
         type=int,
@@ -89,6 +96,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=10,
         help="maximum files queried for artwork previews (default: 10)",
     )
+    parser.add_argument(
+        "--confirm-execution",
+        metavar="PHRASE",
+        help="required with --execute; the exact phrase is MOVE_FILES",
+    )
     return parser
 
 
@@ -97,8 +109,19 @@ def main(argv: list[str] | None = None) -> int:
 
     args = build_parser().parse_args(argv)
     try:
+        if args.confirm_execution and not args.execute:
+            raise ValueError("--confirm-execution can only be used with --execute")
+        if args.execute and args.output.suffix.casefold() not in {".html", ".htm"}:
+            raise ValueError("--execute requires an HTML report output path")
         result = LibraryAnalyzer().analyze(args.library)
-        if args.preflight:
+        execution = None
+        if args.execute:
+            if args.confirm_execution != "MOVE_FILES":
+                raise ValueError("--execute requires --confirm-execution MOVE_FILES")
+            plan = FolderPlanner().plan(result)
+            execution = PlanExecutor().execute(plan)
+            report = write_execution_report(execution, args.output)
+        elif args.preflight:
             plan = FolderPlanner().plan(result)
             preflight = PlanPreflight().validate(plan)
             report = write_preflight_report(preflight, args.output)
@@ -133,6 +156,12 @@ def main(argv: list[str] | None = None) -> int:
             report = write_html_report(result, args.output)
     except (OSError, ValueError) as error:
         build_parser().error(str(error))
+    if args.execute:
+        print(
+            f"Executed {execution.moved_count} move(s) across "
+            f"{len(result.videos)} video(s). Report: {report}"
+        )
+        return 0
     if args.preflight:
         label = "Preflight-checked"
     elif args.artwork:
