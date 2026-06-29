@@ -181,3 +181,50 @@ class EnrichmentResult:
     root: Path
     items: tuple[EnrichedVideo, ...]
     query_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class AcousticFingerprint:
+    """Compact local Chromaprint result for one media file."""
+
+    duration: int
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class AcoustIDRecording:
+    """MusicBrainz recording metadata attached to an AcoustID result."""
+
+    recording_id: str
+    title: str | None
+    artists: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class AcoustIDCandidate:
+    """One AcoustID track candidate and its linked recordings."""
+
+    acoustid_id: str
+    score: float
+    recordings: tuple[AcoustIDRecording, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class FingerprintedVideo:
+    """One video and the outcome of optional acoustic identification."""
+
+    video: AnalyzedVideo
+    status: MatchStatus
+    candidates: tuple[AcoustIDCandidate, ...]
+    duration: int | None
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
+class FingerprintResult:
+    """Read-only acoustic identification results."""
+
+    root: Path
+    items: tuple[FingerprintedVideo, ...]
+    fingerprint_count: int
+    lookup_count: int

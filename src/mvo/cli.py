@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
+from mvo.acoustid import AcoustIDClient, FingerprintExtractor
 from mvo.analyzer import LibraryAnalyzer
 from mvo.duplicate_report import write_duplicate_report
 from mvo.duplicates import DuplicateDetector
 from mvo.enrichment import MusicBrainzEnricher
 from mvo.enrichment_report import write_enrichment_report
+from mvo.fingerprint_report import write_fingerprint_report
+from mvo.fingerprinting import AcousticIdentifier
 from mvo.musicbrainz import MusicBrainzClient
 from mvo.plan_report import write_plan_report
 from mvo.planner import FolderPlanner
@@ -47,11 +51,22 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="opt in to MusicBrainz artist/title searches and write a match report",
     )
+    modes.add_argument(
+        "--acoustid",
+        action="store_true",
+        help="opt in to local Chromaprint and AcoustID fingerprint lookups",
+    )
     parser.add_argument(
         "--max-queries",
         type=int,
         default=25,
         help="maximum MusicBrainz API queries (default: 25)",
+    )
+    parser.add_argument(
+        "--max-fingerprints",
+        type=int,
+        default=5,
+        help="maximum files fingerprinted and sent to AcoustID (default: 5)",
     )
     return parser
 
@@ -62,7 +77,18 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         result = LibraryAnalyzer().analyze(args.library)
-        if args.musicbrainz:
+        if args.acoustid:
+            client_key = os.environ.get("ACOUSTID_CLIENT_KEY", "")
+            if not client_key:
+                raise ValueError("ACOUSTID_CLIENT_KEY must be set for --acoustid")
+            extractor = FingerprintExtractor()
+            if not extractor.available:
+                raise ValueError("fpcalc was not found; install Chromaprint first")
+            fingerprints = AcousticIdentifier(
+                extractor, AcoustIDClient(client_key)
+            ).identify(result, max_files=args.max_fingerprints)
+            report = write_fingerprint_report(fingerprints, args.output)
+        elif args.musicbrainz:
             enrichment = MusicBrainzEnricher(MusicBrainzClient()).enrich(
                 result, max_queries=args.max_queries
             )
@@ -77,7 +103,9 @@ def main(argv: list[str] | None = None) -> int:
             report = write_html_report(result, args.output)
     except (OSError, ValueError) as error:
         build_parser().error(str(error))
-    if args.musicbrainz:
+    if args.acoustid:
+        label = "Fingerprint-checked"
+    elif args.musicbrainz:
         label = "Enriched"
     elif args.duplicates:
         label = "Checked"

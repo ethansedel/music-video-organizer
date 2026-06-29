@@ -18,7 +18,7 @@
 
 - MusicBrainz
 
-# Version 0.7
+# Version 0.7 — released
 
 - AcoustID
 

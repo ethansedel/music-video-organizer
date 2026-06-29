@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from mvo.cli import main
 
 
@@ -80,3 +82,46 @@ def test_cli_creates_opt_in_musicbrainz_report(
     assert media.read_bytes() == b"unchanged"
     assert "did not upload audio" in output.read_text(encoding="utf-8")
     assert "Enriched 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
+
+
+def test_cli_creates_opt_in_acoustid_report(
+    tmp_path: Path, capsys: object, monkeypatch: object
+) -> None:
+    from mvo.acoustid import AcoustIDClient
+    from mvo.models import AcousticFingerprint
+
+    library = tmp_path / "library"
+    library.mkdir()
+    media = library / "Mystery.mp4"
+    media.write_bytes(b"unchanged")
+    output = tmp_path / "acoustid.html"
+
+    class Extractor:
+        available = True
+
+        def fingerprint(self, _path: Path) -> AcousticFingerprint:
+            return AcousticFingerprint(120, "fingerprint")
+
+    payload = {"status": "ok", "results": []}
+    client = AcoustIDClient("key", transport=lambda *_args: payload)
+    monkeypatch.setenv("ACOUSTID_CLIENT_KEY", "key")  # type: ignore[attr-defined]
+    monkeypatch.setattr("mvo.cli.FingerprintExtractor", Extractor)  # type: ignore[attr-defined]
+    monkeypatch.setattr("mvo.cli.AcoustIDClient", lambda _key: client)  # type: ignore[attr-defined]
+
+    exit_code = main(
+        [str(library), "--acoustid", "--max-fingerprints", "1", "-o", str(output)]
+    )
+
+    assert exit_code == 0
+    assert media.read_bytes() == b"unchanged"
+    assert "No fingerprints were submitted" in output.read_text(encoding="utf-8")
+    assert "Fingerprint-checked 1 video(s)" in capsys.readouterr().out  # type: ignore[attr-defined]
+
+
+def test_cli_requires_acoustid_application_client_key(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    monkeypatch.delenv("ACOUSTID_CLIENT_KEY", raising=False)  # type: ignore[attr-defined]
+
+    with pytest.raises(SystemExit):
+        main([str(tmp_path), "--acoustid"])

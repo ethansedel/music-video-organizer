@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "music-video-organizer"
-version = "0.6.0"
+version = "0.7.0"
 description = "Safe, read-only music video filename analysis for Jellyfin and ErsatzTV libraries"
 readme = "README.md"
 requires-python = ">=3.12"

@@ -2,9 +2,9 @@
 
 Music Video Organizer (MVO) scans a music-video library, interprets filenames,
 scores the quality of each interpretation, and writes a standalone HTML report.
-Version 0.6 remains read-only. MusicBrainz enrichment is explicitly
-opt-in and searches only parsed artist/title text; it does not upload audio,
-write tags, or modify media.
+Version 0.7 remains read-only. Acoustic identification is explicitly
+opt-in: Chromaprint runs locally, and only compact fingerprints plus durations
+are sent to AcoustID. Audio, paths, and filenames are never uploaded.
 
 ## Filename conventions
 
@@ -30,6 +30,7 @@ mvo /path/to/music-videos --output report.html
 mvo /path/to/music-videos --plan --output dry-run.html
 mvo /path/to/music-videos --duplicates --output duplicates.html
 mvo /path/to/music-videos --musicbrainz --max-queries 25 --output musicbrainz.html
+ACOUSTID_CLIENT_KEY=... mvo /path/to/music-videos --acoustid --max-fingerprints 5 --output acoustid.html
 pytest
 ```
 
@@ -44,3 +45,9 @@ matches are reported separately and always require human review.
 MusicBrainz mode identifies itself with a project URL, caches repeated searches
 in memory, enforces at least one second between API requests, and caps live
 queries at 25 by default. Increase `--max-queries` deliberately for larger runs.
+
+AcoustID mode requires the official `fpcalc` utility from Chromaprint and an
+application client key in the `ACOUSTID_CLIENT_KEY` environment variable. Do not
+use the separate personal user API key. MVO uses POST
+lookups only—there is intentionally no fingerprint submission feature—and caps
+work at five files by default.

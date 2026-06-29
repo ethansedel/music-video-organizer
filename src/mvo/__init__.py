@@ -1,5 +1,6 @@
 """Music Video Organizer public API."""
 
+from mvo.acoustid import AcoustIDClient, FingerprintExtractor
 from mvo.analyzer import LibraryAnalyzer
 from mvo.duplicates import DuplicateDetector
 from mvo.musicbrainz import MusicBrainzClient
@@ -9,10 +10,12 @@ from mvo.scanner import LibraryScanner
 
 __all__ = [
     "DuplicateDetector",
+    "AcoustIDClient",
     "FilenameParser",
     "FolderPlanner",
+    "FingerprintExtractor",
     "LibraryAnalyzer",
     "LibraryScanner",
     "MusicBrainzClient",
 ]
-__version__ = "0.6.0"
+__version__ = "0.7.0"
