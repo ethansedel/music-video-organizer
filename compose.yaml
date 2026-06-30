@@ -1,7 +1,7 @@
 services:
   liner-notes:
-    build:
-      context: .
+    image: ghcr.io/ethansedel/music-video-organizer:latest
+    pull_policy: always
     container_name: liner-notes
     init: true
     restart: unless-stopped
