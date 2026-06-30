@@ -30,7 +30,7 @@ def render_plan_html(plan: OrganizationPlan) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer dry-run plan</title>
+  <title>Liner Notes dry-run plan</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 110rem; padding: 2rem; }}
@@ -48,7 +48,7 @@ def render_plan_html(plan: OrganizationPlan) -> str:
   </style>
 </head>
 <body>
-  <h1>Music Video Organizer dry-run</h1>
+  <h1>Liner Notes dry-run</h1>
   <p class="notice"><strong>Preview only.</strong> No media has been renamed,
   moved, deleted, or otherwise modified.</p>
   <p><strong>Library:</strong> <code>{escape(str(plan.root))}</code></p>

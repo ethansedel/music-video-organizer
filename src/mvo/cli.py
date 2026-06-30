@@ -33,8 +33,8 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line argument parser."""
 
     parser = argparse.ArgumentParser(
-        prog="mvo",
-        description="Analyze music-video filenames and safely organize libraries.",
+        prog="liner-notes",
+        description="Liner Notes safely analyzes and organizes music-video libraries.",
     )
     parser.add_argument("library", type=Path, help="music-video library directory")
     parser.add_argument(

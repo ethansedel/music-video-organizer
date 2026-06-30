@@ -2,7 +2,14 @@ from pathlib import Path
 
 import pytest
 
-from mvo.cli import main
+from mvo.cli import build_parser, main
+
+
+def test_cli_uses_liner_notes_brand() -> None:
+    parser = build_parser()
+
+    assert parser.prog == "liner-notes"
+    assert "Liner Notes" in parser.description
 
 
 def test_cli_creates_report(tmp_path: Path, capsys: object) -> None:

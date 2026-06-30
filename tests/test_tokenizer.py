@@ -35,6 +35,19 @@ def test_accepts_semicolon_and_double_hyphen_separators() -> None:
     assert tokenizer.tokenize("Artist-- Song.mp4").segments == ("Artist", "Song")
 
 
+def test_accepts_colon_separator_without_splitting_timestamps() -> None:
+    tokenizer = FilenameTokenizer()
+
+    assert tokenizer.tokenize("Paramore: Misery Business.mp4").segments == (
+        "Paramore",
+        "Misery Business",
+    )
+    assert tokenizer.tokenize("Artist - Live 1:23 Edit.mp4").segments == (
+        "Artist",
+        "Live 1:23 Edit",
+    )
+
+
 def test_extracts_curly_qualifier_but_preserves_japanese_alias() -> None:
     result = FilenameTokenizer().tokenize(
         "Ichiban (イチバン) - Super Drive {Official Video}.mp4"

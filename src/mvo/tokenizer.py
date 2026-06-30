@@ -12,7 +12,9 @@ _BRACKETED = re.compile(
     r"\{(?P<braces>[^{}]*)\}"
 )
 _CONTENT_ALIAS = re.compile(r"[\u3040-\u30ff\u3400-\u9fff]")
-_SEPARATOR = re.compile(r"\s*(?:--+|;|\|)\s*|\s+(?:-|\u2013|\u2014)\s+")
+_SEPARATOR = re.compile(
+    r"\s*(?:--+|;|\|)\s*|\s*:\s+|\s+(?:-|\u2013|\u2014)\s+"
+)
 _LEADING_TRACK = re.compile(r"^\s*\d{1,3}\s*[._-]+\s*")
 _WHITESPACE = re.compile(r"\s+")
 

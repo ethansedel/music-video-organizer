@@ -14,7 +14,7 @@ from mvo.models import MusicBrainzCandidate, ReleaseGroupRef
 _RECORDING_ENDPOINT = "https://musicbrainz.org/ws/2/recording/"
 _RELEASE_GROUP_ENDPOINT = "https://musicbrainz.org/ws/2/release-group/"
 _CONTACT = "https://github.com/ethansedel/music-video-organizer"
-_USER_AGENT = f"MusicVideoOrganizer/0.8.0 ({_CONTACT})"
+_USER_AGENT = f"LinerNotes/1.2.0 ({_CONTACT})"
 
 Transport = Callable[[str, Mapping[str, str], float], Mapping[str, Any]]
 
@@ -24,7 +24,7 @@ class MusicBrainzError(RuntimeError):
 
 
 class MusicBrainzClient:
-    """Search recordings while identifying MVO and honoring one request/second."""
+    """Search recordings while identifying Liner Notes and rate limiting."""
 
     def __init__(
         self,

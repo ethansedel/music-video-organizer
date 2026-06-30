@@ -43,7 +43,7 @@ def test_search_builds_identified_json_request_and_parses_candidate() -> None:
     assert query["query"] == [
         'artist:"Artist" AND recording:"Song" AND status:official'
     ]
-    assert calls[0][1]["User-Agent"].startswith("MusicVideoOrganizer/0.8.0 (")
+    assert calls[0][1]["User-Agent"].startswith("LinerNotes/1.2.0 (")
     assert candidates[0].artist_credit == "Artist feat. Guest"
     assert candidates[0].release_titles == ("Single",)
     assert candidates[0].video is True

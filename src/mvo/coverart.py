@@ -12,7 +12,7 @@ from mvo.models import ArtworkImage
 
 _ENDPOINT = "https://coverartarchive.org/release-group/{release_group_id}"
 _USER_AGENT = (
-    "MusicVideoOrganizer/0.8.0 (https://github.com/ethansedel/music-video-organizer)"
+    "LinerNotes/1.2.0 (https://github.com/ethansedel/music-video-organizer)"
 )
 
 Transport = Callable[[str, Mapping[str, str], float], Mapping[str, Any] | None]

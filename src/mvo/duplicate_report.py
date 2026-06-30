@@ -29,7 +29,7 @@ def render_duplicate_html(result: DuplicateResult) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer duplicate report</title>
+  <title>Liner Notes duplicate report</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 96rem; padding: 2rem; }}

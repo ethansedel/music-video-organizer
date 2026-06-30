@@ -29,7 +29,7 @@ def render_execution_html(result: ExecutionResult) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer execution audit</title>
+  <title>Liner Notes execution audit</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 110rem; padding: 2rem; }}
@@ -48,7 +48,7 @@ def render_execution_html(result: ExecutionResult) -> str:
 </head>
 <body>
   <h1>{headline}</h1>
-  <p class="notice">MVO never overwrites destination files. Any failure stops
+  <p class="notice">Liner Notes never overwrites destination files. Any failure stops
   later moves and triggers rollback of moves completed by this run.</p>
   <p><strong>Library:</strong> <code>{escape(str(result.root))}</code></p>
   <section class="summary" aria-label="Summary">

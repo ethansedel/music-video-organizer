@@ -17,7 +17,7 @@ from mvo.models import AcousticFingerprint, AcoustIDCandidate, AcoustIDRecording
 
 _ENDPOINT = "https://api.acoustid.org/v2/lookup"
 _USER_AGENT = (
-    "MusicVideoOrganizer/0.7.0 (https://github.com/ethansedel/music-video-organizer)"
+    "LinerNotes/1.2.0 (https://github.com/ethansedel/music-video-organizer)"
 )
 
 CommandRunner = Callable[[list[str], float], subprocess.CompletedProcess[str]]

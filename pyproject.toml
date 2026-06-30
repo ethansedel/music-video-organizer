@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "music-video-organizer"
-version = "1.1.0.dev0"
-description = "Safe music video organization for Jellyfin and ErsatzTV libraries"
+name = "liner-notes"
+version = "1.2.0.dev0"
+description = "Liner Notes: safe music-video organization for Jellyfin and ErsatzTV"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
-authors = [{ name = "Music Video Organizer contributors" }]
+authors = [{ name = "Liner Notes contributors" }]
 dependencies = []
 
 [project.optional-dependencies]
@@ -19,6 +19,7 @@ dev = [
 ]
 
 [project.scripts]
+liner-notes = "mvo.cli:main"
 mvo = "mvo.cli:main"
 
 [tool.hatch.build.targets.wheel]

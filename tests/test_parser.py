@@ -19,6 +19,14 @@ def test_parses_standard_artist_and_title(parser: FilenameParser) -> None:
     assert result.confidence.score == 0.9
 
 
+def test_parses_colon_delimited_artist_and_title(parser: FilenameParser) -> None:
+    result = parser.parse("Paramore: Misery Business.mp4")
+
+    assert result.artist == "Paramore"
+    assert result.title == "Misery Business"
+    assert result.confidence.level is ConfidenceLevel.HIGH
+
+
 def test_parses_featured_artist_from_artist(parser: FilenameParser) -> None:
     result = parser.parse("Artist feat. Guest - Song.mp4")
 

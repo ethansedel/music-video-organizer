@@ -30,7 +30,7 @@ def render_html(result: AnalysisResult) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer report</title>
+  <title>Liner Notes report</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 96rem; padding: 2rem; }}
@@ -49,7 +49,7 @@ def render_html(result: AnalysisResult) -> str:
 </head>
 <body>
   <header>
-    <h1>Music Video Organizer</h1>
+    <h1>Liner Notes</h1>
     <div><strong>Library:</strong> <code>{escape(str(result.root))}</code></div>
   </header>
   <section class="summary" aria-label="Summary">

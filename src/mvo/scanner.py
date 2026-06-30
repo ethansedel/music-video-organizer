@@ -8,6 +8,8 @@ from pathlib import Path
 from mvo.config import VIDEO_EXTENSIONS
 from mvo.models import ScanIssue, ScanResult, VideoFile
 
+_INTERNAL_DIRECTORIES = {".mvo-trash"}
+
 
 class LibraryScanner:
     """Recursively discover supported video files without following symlinks."""
@@ -31,6 +33,9 @@ class LibraryScanner:
         for directory, directory_names, filenames in os.walk(
             library_root, followlinks=False, onerror=on_error
         ):
+            directory_names[:] = [
+                name for name in directory_names if name not in _INTERNAL_DIRECTORIES
+            ]
             directory_names.sort(key=str.casefold)
             for filename in sorted(filenames, key=str.casefold):
                 path = Path(directory, filename)

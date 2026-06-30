@@ -1,4 +1,4 @@
-"""Music Video Organizer public API."""
+"""Liner Notes public API."""
 
 from mvo.acoustid import AcoustIDClient, FingerprintExtractor
 from mvo.analyzer import LibraryAnalyzer

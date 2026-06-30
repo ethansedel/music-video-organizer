@@ -1,4 +1,4 @@
-"""Immutable domain models shared by the MVO pipeline."""
+"""Immutable domain models shared by the Liner Notes pipeline."""
 
 from __future__ import annotations
 

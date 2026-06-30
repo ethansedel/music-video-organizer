@@ -1,12 +1,12 @@
-# Music Video Organizer (MVO)
+# Liner Notes
 
 ## Purpose
 
-Music Video Organizer is a safe-first application for organizing music video libraries for Jellyfin and ErsatzTV.
+Liner Notes is a safe-first application for organizing music video libraries for Jellyfin and ErsatzTV.
 
 ## Current Milestone
 
-Version 1.1
+Version 1.2
 
 Focus only on:
 
@@ -26,12 +26,17 @@ Focus only on:
 - Rollback and execution audit reports
 - Local skipped-video review editor
 - Persistent, non-media metadata overrides
+- Local previews, thumbnails, and quality inspection
+- Manual MusicBrainz review searches
+- Explicitly confirmed review-editor execution
+- Explicitly confirmed, recoverable duplicate quarantine
+- Liner Notes Trash review, restore, and explicitly confirmed emptying
 - Unit tests
 
 Do NOT implement:
 
 - Ungated file mutations
-- File deletion
+- File deletion outside `.mvo-trash`
 - Artwork downloads beside media
 
 ## Safety
@@ -40,6 +45,10 @@ This project must NEVER modify user media outside the explicit execution mode.
 
 Execution requires the exact `MOVE_FILES` confirmation phrase, immediate
 preflight validation, exclusive non-overwriting moves, and rollback on failure.
+Duplicate removal means moving a revalidated conflict copy into recoverable
+`.mvo-trash` storage after the exact `TRASH_FILE` phrase; permanent deletion
+is restricted to reviewed `.mvo-trash` files after `DELETE_FOREVER` or
+`EMPTY_LINER_NOTES_TRASH` confirmation.
 
 ## Code Style
 

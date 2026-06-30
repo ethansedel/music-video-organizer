@@ -32,7 +32,7 @@ def render_preflight_html(result: PreflightResult) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer preflight</title>
+  <title>Liner Notes preflight</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 110rem; padding: 2rem; }}
@@ -50,7 +50,7 @@ def render_preflight_html(result: PreflightResult) -> str:
   </style>
 </head>
 <body>
-  <h1>Music Video Organizer preflight</h1>
+  <h1>Liner Notes preflight</h1>
   <p class="notice"><strong>Safety snapshot only.</strong> This report does not
   rename, move, delete, or otherwise modify media.</p>
   <p><strong>Library:</strong> <code>{escape(str(result.root))}</code></p>

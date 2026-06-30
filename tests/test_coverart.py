@@ -37,7 +37,7 @@ def test_fetches_release_group_metadata_and_normalizes_https() -> None:
 
     assert calls[0][0].endswith("/release-group/release-group-id")
     assert calls[0][1]["Accept"] == "application/json"
-    assert calls[0][1]["User-Agent"].startswith("MusicVideoOrganizer/0.8.0")
+    assert calls[0][1]["User-Agent"].startswith("LinerNotes/1.2.0")
     assert images[0].image_url.startswith("https://")
     assert images[0].thumbnail_250 == (
         "https://coverartarchive.org/release/id/image-250.jpg"

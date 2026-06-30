@@ -23,7 +23,7 @@ def render_artwork_html(result: ArtworkResult) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Video Organizer artwork preview</title>
+  <title>Liner Notes artwork preview</title>
   <style>
     :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
     body {{ margin: 0 auto; max-width: 110rem; padding: 2rem; }}
@@ -42,9 +42,9 @@ def render_artwork_html(result: ArtworkResult) -> str:
 </head>
 <body>
   <h1>Artwork preview</h1>
-  <p class="notice"><strong>Remote preview only.</strong> MVO did not download or
-  save artwork beside media. Opening this report loads lazy thumbnails directly
-  from the Cover Art Archive or Internet Archive.</p>
+  <p class="notice"><strong>Remote preview only.</strong>
+  Liner Notes did not download or save artwork beside media. This report loads lazy
+  thumbnails directly from the Cover Art Archive or Internet Archive.</p>
   <p><strong>Library:</strong> <code>{escape(str(result.root))}</code></p>
   <section class="summary" aria-label="Summary">
     <div class="stat">
