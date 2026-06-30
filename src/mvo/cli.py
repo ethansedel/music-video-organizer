@@ -120,6 +120,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="local review editor port (default: 8765)",
     )
     parser.add_argument(
+        "--review-host",
+        default=os.environ.get("LINER_NOTES_HOST", "127.0.0.1"),
+        help="review editor bind address (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--review-password",
+        default=os.environ.get("LINER_NOTES_PASSWORD"),
+        help="HTTP password; required when binding beyond localhost",
+    )
+    parser.add_argument(
         "--no-open",
         action="store_true",
         help="with --review, print the address without opening a browser",
@@ -138,14 +148,26 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("--execute requires an HTML report output path")
         if not 0 <= args.review_port <= 65535:
             raise ValueError("--review-port must be between 0 and 65535")
+        loopback_hosts = {"127.0.0.1", "::1", "localhost"}
+        if (
+            args.review
+            and args.review_host not in loopback_hosts
+            and (not args.review_password or len(args.review_password) < 8)
+        ):
+            raise ValueError(
+                "a LINER_NOTES_PASSWORD of at least 8 characters is required "
+                "when --review-host is not localhost"
+            )
         raw_result = LibraryAnalyzer().analyze(args.library)
         overrides_path = args.overrides or raw_result.root / ".mvo-overrides.json"
         override_store = MetadataOverrideStore(overrides_path)
         if args.review:
             serve_review(
                 ReviewSession(raw_result, override_store),
+                host=args.review_host,
                 port=args.review_port,
                 open_browser=not args.no_open,
+                password=args.review_password or None,
             )
             return 0
         result = override_store.apply(raw_result)

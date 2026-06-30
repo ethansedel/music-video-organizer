@@ -3,7 +3,7 @@ from pathlib import Path
 from mvo.analyzer import LibraryAnalyzer
 from mvo.musicbrainz import MusicBrainzClient
 from mvo.overrides import MetadataOverrideStore
-from mvo.review import ReviewSession
+from mvo.review import ReviewSession, _basic_authorization
 
 
 def test_review_session_shows_skipped_video_and_saves_resolution(
@@ -32,6 +32,12 @@ def test_review_session_shows_skipped_video_and_saves_resolution(
     assert updated["destination"] == "Artist/Artist - Song.mp4"
     assert media.read_bytes() == b"video"
     assert store.path.exists()
+
+
+def test_network_review_uses_liner_notes_basic_credentials() -> None:
+    assert _basic_authorization("secret-pass") == (
+        "Basic bGluZXItbm90ZXM6c2VjcmV0LXBhc3M="
+    )
 
 
 def test_review_session_rejects_video_not_in_review_set(tmp_path: Path) -> None:

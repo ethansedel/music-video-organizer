@@ -1,0 +1,32 @@
+services:
+  liner-notes:
+    build:
+      context: .
+    container_name: liner-notes
+    init: true
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      LINER_NOTES_PASSWORD: "${LINER_NOTES_PASSWORD:?Set LINER_NOTES_PASSWORD in .env}"
+    ports:
+      - "${LINER_NOTES_BIND:-0.0.0.0}:${LINER_NOTES_PORT:-8765}:8765"
+    volumes:
+      - "${MUSIC_VIDEO_PATH:?Set MUSIC_VIDEO_PATH in .env}:/library"
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/healthz', timeout=5)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 2m
+    stop_grace_period: 30s

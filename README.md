@@ -107,5 +107,43 @@ immediate-revalidation, and rollback guarantees as command-line execution.
 Corrections are stored in `.mvo-overrides.json` at the library root. Later
 analysis, plan, preflight, and execution commands load that file automatically.
 Use `--overrides /another/path.json` when the corrections file should live
-somewhere else. The editor listens only on this computer; press Control-C in the
-terminal when finished.
+somewhere else. The editor listens only on this computer by default; press
+Control-C in the terminal when finished.
+
+## Docker Compose server
+
+Docker Compose runs Liner Notes continuously on a server with ffmpeg and
+ffprobe included. Clone the repository on the Docker server, then configure it:
+
+```shell
+cp .env.example .env
+```
+
+Edit `.env` and set:
+
+- `MUSIC_VIDEO_PATH` to the absolute server path containing the videos.
+- `LINER_NOTES_PASSWORD` to a long password of at least eight characters.
+- `PUID` and `PGID` to the numeric owner of the video library. Run `id` on the
+  server to find them.
+
+Start the service:
+
+```shell
+docker compose up -d --build
+docker compose logs -f liner-notes
+```
+
+Open `http://SERVER-IP:8765/`, use `liner-notes` as the username, and use the
+password from `.env`. The library mount must be writable for saving corrections,
+organizing files, and using Liner Notes Trash. The container itself runs without
+Linux capabilities and with a read-only root filesystem.
+
+HTTP Basic authentication does not encrypt traffic. Keep the default deployment
+on a trusted private network. For access outside that network, set
+`LINER_NOTES_BIND=127.0.0.1` and place Liner Notes behind an HTTPS reverse proxy
+or VPN. To update after pulling new source:
+
+```shell
+git pull
+docker compose up -d --build
+```

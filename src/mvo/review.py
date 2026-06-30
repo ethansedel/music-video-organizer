@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import mimetypes
 import secrets
@@ -430,19 +431,23 @@ class ReviewSession:
 def serve_review(
     session: ReviewSession,
     *,
+    host: str = "127.0.0.1",
     port: int = 8765,
     open_browser: bool = True,
+    password: str | None = None,
 ) -> None:
-    """Serve the review GUI on loopback until interrupted by the user."""
+    """Serve the password-protected review GUI until interrupted."""
 
     token = secrets.token_urlsafe(24)
-    handler = _handler_for(session, token)
-    server = ThreadingHTTPServer(("127.0.0.1", port), handler)
-    url = f"http://127.0.0.1:{server.server_port}/"
+    handler = _handler_for(session, token, password=password)
+    server = ThreadingHTTPServer((host, port), handler)
+    url = f"http://{host}:{server.server_port}/"
     print(f"Reviewing {len(session.review_paths)} video(s) at {url}")
     print(f"Corrections file: {session.store.path}")
+    if password is not None:
+        print("HTTP username: liner-notes")
     print("Press Control-C when you are finished.")
-    if open_browser:
+    if open_browser and host in {"127.0.0.1", "::1", "localhost"}:
         webbrowser.open(url)
     try:
         server.serve_forever()
@@ -453,13 +458,21 @@ def serve_review(
 
 
 def _handler_for(
-    session: ReviewSession, token: str
+    session: ReviewSession,
+    token: str,
+    *,
+    password: str | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     class ReviewHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:  # noqa: N802
             parsed_url = urlsplit(self.path)
             path = parsed_url.path
             query = parse_qs(parsed_url.query)
+            if path == "/healthz":
+                self._send_json(HTTPStatus.OK, {"status": "ok"})
+                return
+            if not self._authorized():
+                return
             if path == "/":
                 self._send_bytes(
                     HTTPStatus.OK,
@@ -512,6 +525,8 @@ def _handler_for(
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
 
         def do_POST(self) -> None:  # noqa: N802
+            if not self._authorized():
+                return
             path = urlsplit(self.path).path
             if path not in {
                 "/api/overrides",
@@ -585,6 +600,21 @@ def _handler_for(
         def log_message(self, _format: str, *_args: Any) -> None:
             return
 
+        def _authorized(self) -> bool:
+            if password is None:
+                return True
+            expected = _basic_authorization(password)
+            if secrets.compare_digest(
+                self.headers.get("Authorization", ""), expected
+            ):
+                return True
+            self.send_response(HTTPStatus.UNAUTHORIZED)
+            self.send_header("WWW-Authenticate", 'Basic realm="Liner Notes"')
+            self.send_header("Content-Length", "0")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return False
+
         def _send_json(self, status: HTTPStatus, payload: object) -> None:
             self._send_bytes(
                 status,
@@ -652,6 +682,13 @@ def _handler_for(
                     remaining -= len(chunk)
 
     return ReviewHandler
+
+
+def _basic_authorization(password: str) -> str:
+    """Build the exact HTTP Basic value used by the server."""
+
+    credentials = base64.b64encode(f"liner-notes:{password}".encode()).decode()
+    return f"Basic {credentials}"
 
 
 def _page(token: str) -> str:

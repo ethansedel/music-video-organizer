@@ -31,6 +31,7 @@ Focus only on:
 - Explicitly confirmed review-editor execution
 - Explicitly confirmed, recoverable duplicate quarantine
 - Liner Notes Trash review, restore, and explicitly confirmed emptying
+- Password-protected Docker Compose deployment
 - Unit tests
 
 Do NOT implement:

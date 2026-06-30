@@ -58,3 +58,4 @@
 - Compare conflict copies side by side
 - Move unwanted conflict copies into recoverable, audited Liner Notes Trash
 - Review, restore, or explicitly delete Liner Notes Trash contents
+- Run Liner Notes as a password-protected Docker Compose service

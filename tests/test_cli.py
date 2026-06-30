@@ -47,8 +47,21 @@ def test_cli_starts_review_editor_without_modifying_media(
     media.write_bytes(b"unchanged")
     called: dict[str, object] = {}
 
-    def fake_serve(session: object, *, port: int, open_browser: bool) -> None:
-        called.update(session=session, port=port, open_browser=open_browser)
+    def fake_serve(
+        session: object,
+        *,
+        host: str,
+        port: int,
+        open_browser: bool,
+        password: str | None,
+    ) -> None:
+        called.update(
+            session=session,
+            host=host,
+            port=port,
+            open_browser=open_browser,
+            password=password,
+        )
 
     monkeypatch.setattr("mvo.cli.serve_review", fake_serve)  # type: ignore[attr-defined]
 
@@ -56,8 +69,15 @@ def test_cli_starts_review_editor_without_modifying_media(
 
     assert exit_code == 0
     assert called["port"] == 9000
+    assert called["host"] == "127.0.0.1"
     assert called["open_browser"] is True
+    assert called["password"] is None
     assert media.read_bytes() == b"unchanged"
+
+
+def test_cli_requires_password_for_network_review(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        main([str(tmp_path), "--review", "--review-host", "0.0.0.0"])
 
 
 def test_cli_creates_read_only_preflight_report(tmp_path: Path, capsys: object) -> None:
