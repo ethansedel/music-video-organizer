@@ -7,7 +7,7 @@ from mvo.quarantine import DuplicateQuarantine
 from mvo.scanner import LibraryScanner
 
 
-def test_quarantine_requires_exact_phrase_and_preserves_recoverable_copy(
+def test_quarantine_preserves_recoverable_copy_without_typed_phrase(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "Artist - Song [720p].mp4"
@@ -15,12 +15,7 @@ def test_quarantine_requires_exact_phrase_and_preserves_recoverable_copy(
     video = LibraryScanner().scan(tmp_path).files[0]
     quarantine = DuplicateQuarantine()
 
-    with pytest.raises(ValueError, match="TRASH_FILE"):
-        quarantine.quarantine(tmp_path, video, confirmation="wrong")
-
-    assert source.read_bytes() == b"video"
-
-    result = quarantine.quarantine(tmp_path, video, confirmation="TRASH_FILE")
+    result = quarantine.quarantine(tmp_path, video)
 
     assert not source.exists()
     assert result.destination.read_bytes() == b"video"
@@ -49,31 +44,19 @@ def test_mvo_trash_supports_restore_and_gated_permanent_deletion(
     source.write_bytes(b"video")
     quarantine = DuplicateQuarantine()
     video = LibraryScanner().scan(tmp_path).files[0]
-    trashed = quarantine.quarantine(tmp_path, video, confirmation="TRASH_FILE")
+    trashed = quarantine.quarantine(tmp_path, video)
     relative = trashed.destination.relative_to(tmp_path).as_posix()
 
-    with pytest.raises(ValueError, match="RESTORE_FILE"):
-        quarantine.restore(tmp_path, relative, confirmation="wrong")
-
-    restored = quarantine.restore(tmp_path, relative, confirmation="RESTORE_FILE")
+    restored = quarantine.restore(tmp_path, relative)
 
     assert restored == source
     assert restored.read_bytes() == b"video"
 
     video = LibraryScanner().scan(tmp_path).files[0]
-    trashed = quarantine.quarantine(tmp_path, video, confirmation="TRASH_FILE")
+    trashed = quarantine.quarantine(tmp_path, video)
     relative = trashed.destination.relative_to(tmp_path).as_posix()
 
-    with pytest.raises(ValueError, match="DELETE_FOREVER"):
-        quarantine.delete_permanently(tmp_path, relative, confirmation="wrong")
-
-    assert trashed.destination.exists()
-    assert (
-        quarantine.delete_permanently(
-            tmp_path, relative, confirmation="DELETE_FOREVER"
-        )
-        == 5
-    )
+    assert quarantine.delete_permanently(tmp_path, relative) == 5
     assert not trashed.destination.exists()
 
 

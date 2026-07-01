@@ -90,15 +90,15 @@ a manual MusicBrainz search. Correct the artist, title, featured artists,
 version, or year and choose **Save correction**.
 
 For destination conflicts, Liner Notes recommends a preferred copy using resolution
-tags and file size. Choosing it preserves the other copies with distinct
-`Alternate` labels. The comparison panel can instead move an unwanted copy to
-hidden `.mvo-trash` storage after the exact `TRASH_FILE` confirmation. This is
-recoverable quarantine, not permanent deletion; every move is recorded in
+tags and file size. Choosing it keeps that copy and moves the other conflicting
+copies to hidden `.mvo-trash` storage. The comparison panel can also quarantine
+one unwanted copy directly. This is recoverable quarantine, not permanent
+deletion; every move is recorded in
 `.mvo-trash/audit.jsonl`, and Liner Notes excludes that folder from future scans.
-The **Liner Notes Trash** view supports previews, restore with `RESTORE_FILE`, individual
-permanent deletion with `DELETE_FOREVER`, and bulk emptying with
-`EMPTY_LINER_NOTES_TRASH`. Permanent deletion is never available for active library
-files.
+The **Liner Notes Trash** view supports previews, one-click restore, individual
+permanent deletion after a browser warning, and bulk emptying with the exact
+`EMPTY_LINER_NOTES_TRASH` phrase. Permanent deletion is never available for
+active library files.
 **Commit saved changes** moves only
 saved, ready corrections after the exact `MOVE_FILES` confirmation and writes
 `.mvo-review-execution.html` as an audit report. It keeps the same no-overwrite,
@@ -109,6 +109,15 @@ analysis, plan, preflight, and execution commands load that file automatically.
 Use `--overrides /another/path.json` when the corrections file should live
 somewhere else. The editor listens only on this computer by default; press
 Control-C in the terminal when finished.
+
+The review workspace automatically rescans every five minutes and also provides
+a manual **Refresh library** button. Select multiple organized videos to export
+adjacent, non-overwriting Jellyfin `.nfo` sidecars; videos with a pending move
+must be organized first so a sidecar is never left behind. **History & undo** records organization
+and quarantine moves in `.mvo-history.jsonl` and reverses a move only when its
+recorded destination is unchanged and the original path is free. **Server
+readiness** checks dataset access, free space, ffmpeg, ffprobe, and the active
+container UID/GID, and reminds TrueNAS users to configure periodic snapshots.
 
 ## Docker Compose and Dockge
 
@@ -158,8 +167,9 @@ password from `.env`. The library mount must be writable for saving corrections,
 organizing files, and using Liner Notes Trash. The container itself runs without
 Linux capabilities and with a read-only root filesystem.
 
-The ready-made image supports 64-bit Intel/AMD and ARM servers. HTTP Basic
-authentication does not encrypt traffic. Keep the default deployment
+The ready-made image supports 64-bit Intel/AMD and ARM servers. Liner Notes uses
+a themed password form and an HTTP-only session cookie, but plain HTTP still
+does not encrypt traffic. Keep the default deployment
 on a trusted private network. For access outside that network, set
 `LINER_NOTES_BIND=127.0.0.1` and place Liner Notes behind an HTTPS reverse proxy
 or VPN. To update after pulling new source:

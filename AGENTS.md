@@ -6,7 +6,7 @@ Liner Notes is a safe-first application for organizing music video libraries for
 
 ## Current Milestone
 
-Version 1.2
+Version 1.3
 
 Focus only on:
 
@@ -32,6 +32,12 @@ Focus only on:
 - Explicitly confirmed, recoverable duplicate quarantine
 - Liner Notes Trash review, restore, and explicitly confirmed emptying
 - Password-protected Docker Compose deployment
+- Themed session-cookie sign-in
+- Automatic and manual library rescanning
+- Jellyfin NFO preview and export
+- TrueNAS readiness checks
+- Persistent activity history and safe undo
+- Bulk video selection
 - Unit tests
 
 Do NOT implement:
@@ -47,9 +53,8 @@ This project must NEVER modify user media outside the explicit execution mode.
 Execution requires the exact `MOVE_FILES` confirmation phrase, immediate
 preflight validation, exclusive non-overwriting moves, and rollback on failure.
 Duplicate removal means moving a revalidated conflict copy into recoverable
-`.mvo-trash` storage after the exact `TRASH_FILE` phrase; permanent deletion
-is restricted to reviewed `.mvo-trash` files after `DELETE_FOREVER` or
-`EMPTY_LINER_NOTES_TRASH` confirmation.
+`.mvo-trash` storage. The exact `EMPTY_LINER_NOTES_TRASH` confirmation remains
+required before bulk permanent deletion.
 
 ## Code Style
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "liner-notes"
-version = "1.2.0.dev0"
+version = "1.3.0.dev0"
 description = "Liner Notes: safe music-video organization for Jellyfin and ErsatzTV"
 readme = "README.md"
 requires-python = ">=3.12"

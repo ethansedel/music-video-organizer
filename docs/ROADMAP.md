@@ -47,7 +47,7 @@
 - Persistent artist, title, featured artist, version, and year corrections
 - Apply reviewed metadata to plans, preflight checks, and execution
 
-# Version 1.2 — in development
+# Version 1.2 — released
 
 - Parse `Artist: Title` filenames
 - Preview local videos and generate temporary thumbnails
@@ -59,3 +59,14 @@
 - Move unwanted conflict copies into recoverable, audited Liner Notes Trash
 - Review, restore, or explicitly delete Liner Notes Trash contents
 - Run Liner Notes as a password-protected Docker Compose service
+
+# Version 1.3 — in development
+
+- Themed Liner Notes sign-in page and secure session cookie
+- Manual refresh and automatic five-minute library rescanning
+- Keep a preferred conflict copy and quarantine the other copies
+- One-click recoverable Trash actions; typed confirmation only when emptying Trash
+- Jellyfin NFO preview, individual export, and bulk export
+- TrueNAS dataset, tool, identity, free-space, and snapshot readiness guidance
+- Persistent activity history with revalidated, non-overwriting undo
+- Bulk selection tools for large libraries

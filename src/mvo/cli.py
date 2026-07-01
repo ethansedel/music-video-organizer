@@ -130,6 +130,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="HTTP password; required when binding beyond localhost",
     )
     parser.add_argument(
+        "--review-refresh-seconds",
+        type=int,
+        default=int(os.environ.get("LINER_NOTES_REFRESH_SECONDS", "300")),
+        help="automatic review library refresh interval (default: 300 seconds)",
+    )
+    parser.add_argument(
         "--no-open",
         action="store_true",
         help="with --review, print the address without opening a browser",
@@ -148,6 +154,8 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("--execute requires an HTML report output path")
         if not 0 <= args.review_port <= 65535:
             raise ValueError("--review-port must be between 0 and 65535")
+        if args.review_refresh_seconds < 30:
+            raise ValueError("--review-refresh-seconds must be at least 30")
         loopback_hosts = {"127.0.0.1", "::1", "localhost"}
         if (
             args.review
@@ -168,6 +176,7 @@ def main(argv: list[str] | None = None) -> int:
                 port=args.review_port,
                 open_browser=not args.no_open,
                 password=args.review_password or None,
+                refresh_seconds=args.review_refresh_seconds,
             )
             return 0
         result = override_store.apply(raw_result)

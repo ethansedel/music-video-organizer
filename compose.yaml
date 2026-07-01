@@ -8,6 +8,7 @@ services:
     user: "${PUID:-1000}:${PGID:-1000}"
     environment:
       LINER_NOTES_PASSWORD: "${LINER_NOTES_PASSWORD:?Set LINER_NOTES_PASSWORD in .env}"
+      LINER_NOTES_REFRESH_SECONDS: "${LINER_NOTES_REFRESH_SECONDS:-300}"
     ports:
       - "${LINER_NOTES_BIND:-0.0.0.0}:${LINER_NOTES_PORT:-8765}:8765"
     volumes:

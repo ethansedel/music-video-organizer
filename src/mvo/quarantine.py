@@ -31,13 +31,9 @@ class DuplicateQuarantine:
         self,
         root: Path,
         video: VideoFile,
-        *,
-        confirmation: object,
     ) -> QuarantineResult:
-        """Quarantine one exact scanned file after the `TRASH_FILE` phrase."""
+        """Quarantine one exact scanned file after immediate revalidation."""
 
-        if confirmation != "TRASH_FILE":
-            raise ValueError("type TRASH_FILE to move this copy to Liner Notes Trash")
         self._revalidate(video)
         trash_root = root / self.directory_name
         destination = trash_root / video.relative_path
@@ -80,13 +76,9 @@ class DuplicateQuarantine:
         )
         return tuple(sorted(files, key=lambda path: path.as_posix().casefold()))
 
-    def restore(
-        self, root: Path, relative_path: object, *, confirmation: object
-    ) -> Path:
+    def restore(self, root: Path, relative_path: object) -> Path:
         """Restore one quarantined file to its original non-overwriting path."""
 
-        if confirmation != "RESTORE_FILE":
-            raise ValueError("type RESTORE_FILE to restore this copy")
         source = self.resolve(root, relative_path)
         trash_root = root / self.directory_name
         destination = root / source.relative_to(trash_root)
@@ -110,13 +102,9 @@ class DuplicateQuarantine:
             raise
         return destination
 
-    def delete_permanently(
-        self, root: Path, relative_path: object, *, confirmation: object
-    ) -> int:
+    def delete_permanently(self, root: Path, relative_path: object) -> int:
         """Permanently unlink one file already inside Liner Notes Trash."""
 
-        if confirmation != "DELETE_FOREVER":
-            raise ValueError("type DELETE_FOREVER to permanently delete this file")
         path = self.resolve(root, relative_path)
         trash_root = root / self.directory_name
         size = path.stat().st_size
@@ -143,9 +131,7 @@ class DuplicateQuarantine:
         for path in self.list_files(root):
             relative = path.relative_to(root).as_posix()
             try:
-                deleted_bytes += self.delete_permanently(
-                    root, relative, confirmation="DELETE_FOREVER"
-                )
+                deleted_bytes += self.delete_permanently(root, relative)
             except OSError as error:
                 errors.append(f"{relative}: {error}")
             else:
